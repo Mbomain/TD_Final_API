@@ -1,0 +1,264 @@
+openapi: 3.0.3
+info:
+  title: Football Management API
+  version: 1.0.0
+  description: TD Final PART 1 STD23072
+
+paths:
+  /tournaments:
+    get:
+      summary: Get a list of tournaments
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Page number.
+        - name: size
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Items per page.
+      responses:
+        '200':
+          description: A list of tournaments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTournaments'
+    post:
+      summary: Create a new tournament
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Tournament'
+      responses:
+        '201':
+          description: Tournament created
+
+  /clubs:
+    get:
+      summary: Get a list of clubs
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Filter clubs by name.
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Page number.
+        - name: size
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Items per page.
+      responses:
+        '200':
+          description: A list of clubs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedClubs'
+    post:
+      summary: Create a new club
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Club'
+      responses:
+        '201':
+          description: Club created
+
+  /clubs/{clubId}/players:
+    get:
+      summary: Get a list of players for a specific club
+      parameters:
+        - name: clubId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the club.
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: Filter players by name.
+        - name: page
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Page number.
+        - name: size
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Items per page.
+      responses:
+        '200':
+          description: A list of players in the club
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPlayers'
+    post:
+      summary: Add a player to the club
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Player'
+      responses:
+        '201':
+          description: Player added to the club
+
+  /clubs/{clubId}/tournaments:
+    post:
+      summary: Assign tournaments to a club
+      parameters:
+        - name: clubId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the club.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignTournaments'
+      responses:
+        '200':
+          description: Tournaments assigned to the club
+
+  /clubs/{clubId}/players/transfer:
+    post:
+      summary: Transfer players to a club
+      parameters:
+        - name: clubId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the club.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferPlayers'
+      responses:
+        '200':
+          description: Players transferred to the club
+
+components:
+  schemas:
+    Tournament:
+      type: object
+      properties:
+        name:
+          type: string
+        region:
+          type: string
+
+    Player:
+      type: object
+      properties:
+        name:
+          type: string
+        number:
+          type: integer
+        foot:
+          type: string
+          enum:
+            - Left
+            - Right
+
+    Club:
+      type: object
+      properties:
+        name:
+          type: string
+        motto:
+          type: string
+        tournaments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tournament'
+        players:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+
+    AssignTournaments:
+      type: object
+      properties:
+        tournamentIds:
+          type: array
+          items:
+            type: integer
+
+    TransferPlayers:
+      type: object
+      properties:
+        playerIds:
+          type: array
+          items:
+            type: integer
+
+    PaginatedTournaments:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tournament'
+        page:
+          type: integer
+        size:
+          type: integer
+        total:
+          type: integer
+
+    PaginatedClubs:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Club'
+        page:
+          type: integer
+        size:
+          type: integer
+        total:
+          type: integer
+
+    PaginatedPlayers:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Player'
+        page:
+          type: integer
+        size:
+          type: integer
+        total:
+          type: integer
